@@ -1,25 +1,25 @@
-language: generic 
-sudo: required
-services:
-    - docker
-
-before_install:
-    - docker-compose build
-script:
-    - docker-compose up
-
-
-#language: node_js
-#node_js:
-#  - "stable"
-#Services:
-# - mongodb
-#cache:
-#  directories:
-#  - node_modules
-#install:
-#  - npm install
-#script:
-#  -npm run test # --watchAll=false
+#language: generic 
+#sudo: required
 #services:
-# - mongodb
+#    - docker
+#
+#before_install:
+#    - docker-compose build
+#script:
+#    - docker-compose up
+#
+
+language: node_js
+node_js:
+  - "stable"
+Services:
+ - mongodb
+cache:
+  directories:
+  - node_modules
+install:
+  - npm install
+script:
+  -npm run test # --watchAll=false
+services:
+ - mongodb
