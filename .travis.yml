@@ -20,6 +20,6 @@ cache:
 install:
   - npm install
 script:
-  -npm run test # --watchAll=false
+  - npm run test # --watchAll=false
 services:
  - mongodb
