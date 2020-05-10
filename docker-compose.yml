@@ -9,7 +9,10 @@ services:
             dockerfile: Dockerfile
         ports: 
             - "3000:3040"
+        depends_on: 
+            - db
         command: ["npm","start"]   
+
     db:
         image: mongo
         ports:
