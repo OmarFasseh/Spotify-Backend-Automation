@@ -32,7 +32,7 @@ app.use('/me/albums', artistAlbumRouter)
 // Middlewares
 // after all handeled routes
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server! :(`, 404))
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))
 })
 
 // handled undefined routes
