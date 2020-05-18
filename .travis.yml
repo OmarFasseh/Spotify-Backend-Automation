@@ -3,6 +3,9 @@ node_js:
 - stable
 Services:
 - mongodb
+addons:
+  ssh_known_hosts:
+  - 138.91.114.14
 cache:
   directories:
   - node_modules
