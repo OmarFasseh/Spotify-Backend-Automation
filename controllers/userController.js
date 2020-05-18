@@ -52,7 +52,7 @@ const requestResetPassword = catchAsync(async function (req, res, next) {
 
   const text = 'Hello.\n\nNo need to worry, you can reset your Spotify password by clicking the link below: ' +
     process.env.DOMAIN_URL + '/resetPassword/' + token + '\n\n' +
-    ' If you didn\'t request a password reset, feel free to delete this email and carry on enjoying your music!\n All the best,\nSystem 424 Team \n'
+    ' If you didn\'t request a password reset, feel free to delete this email and carry on enjoying your music!\n All the best,\nSystem 424 Team :)) \n'
 
   await mailerService.sendMail(req.body.email, subject, text)
   // If everything is fine, send an empty body code 204.
