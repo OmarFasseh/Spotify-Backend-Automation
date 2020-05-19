@@ -90,7 +90,9 @@ class notificationService {
     * Generate notification to send to user and saves it to database.
     * @function
     * @param {String} title - The title of the notification.
-    * @param {String} message - The message of the notification.
+    * @param {String} body - The body of message of the notification.
+    * @param {String} userId - The user id of the user to receive notification.
+    * @param {Object} data - The data of the notification. (URI, HREF, Images links, etc)
     * @returns {Object} - The notification JSON to send to user
     */
   async generateNotification(title, body, userId, data) {
@@ -109,8 +111,8 @@ class notificationService {
   /**
     * Sends notification to user
     * @function
-    * @param {String} authToken - The authorization token of the user.
-    * @param {String} notification - The notification to be sent
+    * @param {String} userId - The user id of the user.
+    * @param {Object} notification - The notification to be sent
     * @returns {Object} notification - The notification sent
     */
   async sendNotification(userId, notification) {
@@ -124,6 +126,15 @@ class notificationService {
     notification.token = tokensToSend
     await admin.messaging().send(notification)
     return notification
+  }
+
+  /**
+    * Sends notification to topic subscribers
+    * @function
+    * @param {Object} notification - The notification to be sent
+    */
+   async sendNotificationTopic(notification) {
+    await admin.messaging().send(notification)
   }
 
   /**
