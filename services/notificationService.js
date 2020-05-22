@@ -90,7 +90,9 @@ class notificationService {
     * Generate notification to send to user and saves it to database.
     * @function
     * @param {String} title - The title of the notification.
-    * @param {String} message - The message of the notification.
+    * @param {String} body - The body of message of the notification.
+    * @param {String} userId - The user id of the user to receive notification.
+    * @param {Object} data - The data of the notification. (URI, HREF, Images links, etc)
     * @returns {Object} - The notification JSON to send to user
     */
   async generateNotification(title, body, userId, data) {
@@ -101,29 +103,38 @@ class notificationService {
     notif.time = Date.now()
     notif.userId = userId
     await notif.save()
-    const message = {"notification": notif.notification, "token":"", "data": notif.data}
+    const message = { "notification": notif.notification, "tokens": "", "data": notif.data }
     return message
   }
 
-  
+
   /**
     * Sends notification to user
     * @function
-    * @param {String} authToken - The authorization token of the user.
-    * @param {String} notification - The notification to be sent
+    * @param {String} userId - The user id of the user.
+    * @param {Object} notification - The notification to be sent
     * @returns {Object} notification - The notification sent
     */
   async sendNotification(userId, notification) {
     const tokens = await this.getToken(userId)
     //Check if no tokens available, then don't send notification.
-    if(tokens[0]=='' && tokens[1]== '') return null
+    if (tokens[0] == '' && tokens[1] == '') return null
     let tokensToSend = []
     //Add existing tokens only
     if (tokens[0] != '') tokensToSend.push(tokens[0])
     if (tokens[1] != '') tokensToSend.push(tokens[1])
-    notification.token = tokensToSend
-    await admin.messaging().send(notification)
+    notification.tokens = tokensToSend
+    await admin.messaging().sendMulticast(notification)
     return notification
+  }
+
+  /**
+    * Sends notification to topic subscribers
+    * @function
+    * @param {Object} notification - The notification to be sent
+    */
+  async sendNotificationTopic(notification) {
+    await admin.messaging().send(notification)
   }
 
   /**
@@ -133,14 +144,16 @@ class notificationService {
     * @param {String} topic - The authorization token of the user.
     * @returns {Object} - The tokens used and the topic to subscribe to.
     */
-   async subscribeToTopic(userId, topic) {
+  async subscribeToTopic(userId, topic) {
     const tokens = await this.getToken(userId)
+    //Check if no tokens available, then don't send notification.
+    if (tokens[0] == '' && tokens[1] == '') return null
     let tokensToSend = []
     if (tokens[0] != null) tokensToSend.push(tokens[0])
     if (tokens[1] != null) tokensToSend.push(tokens[1])
     await admin.messaging().subscribeToTopic(tokensToSend, topic)
     const subscription = {
-      'token':tokensToSend,
+      'tokens': tokensToSend,
       'topic': topic
     }
     return subscription

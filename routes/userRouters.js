@@ -134,6 +134,30 @@ router.put('/me/changePassword', authController.protect, authController.changePa
 */
 router.put('/me/following', authController.protect, authController.followArtistUser)
 
+/**
+* Route for getting followed users
+* @name get/me/following
+* @function
+* @memberof module:routes/users
+* @inner
+* @param {string} path - follow user path
+* @param {callback} middleware - Protect middleware.
+* @param {callback} middleware - follow user middleware.
+*/
+router.get('/me/following', authController.protect, authController.getfollowedArtistUser)
+
+/**
+* Route for getting user's followers
+* @name get/me/followers
+* @function
+* @memberof module:routes/users
+* @inner
+* @param {string} path - follow user path
+* @param {callback} middleware - Protect middleware.
+* @param {callback} middleware - follow user middleware.
+*/
+router.get('/me/followers', authController.protect, authController.getUserfollowers)
+
 
 /**
 * Route for requesting to unfollow user
@@ -147,6 +171,17 @@ router.put('/me/following', authController.protect, authController.followArtistU
 */
 router.delete('/me/following', authController.protect, authController.unfollowArtistUser)
 
+/**
+* Route for getting followed artists
+* @name get/me/likedArtists
+* @function
+* @memberof module:routes/users
+* @inner
+* @param {string} path - follow user path
+* @param {callback} middleware - Protect middleware.
+* @param {callback} middleware - follow user middleware.
+*/
+router.get('/me/likedArtists', authController.protect, authController.getfollowedArtists)
 
 /**
 * Route for requesting to like track
@@ -159,6 +194,18 @@ router.delete('/me/following', authController.protect, authController.unfollowAr
 * @param {callback} middleware - like track middleware.
 */
 router.put('/me/likeTrack', authController.protect, authController.likeTrack)
+
+/**
+* Route for getting to liked tracks
+* @name get/me/likedTracks
+* @function
+* @memberof module:routes/users
+* @inner
+* @param {string} path - like track path
+* @param {callback} middleware - Protect middleware.
+* @param {callback} middleware - get liked tracks middleware.
+*/
+router.get('/me/likedTracks', authController.protect, authController.getLikedTracks)
 
 
 /**
@@ -185,6 +232,18 @@ router.delete('/me/unlikeTrack', authController.protect, authController.unlikeTr
 * @param {callback} middleware - like album middleware.
 */
 router.put('/me/likeAlbum', authController.protect, authController.likeAlbum)
+
+/**
+* Route for getting liked albums
+* @name get/me/likedAlbums
+* @function
+* @memberof module:routes/users
+* @inner
+* @param {string} path - like album path
+* @param {callback} middleware - Protect middleware.
+* @param {callback} middleware - get liked albums middleware.
+*/
+router.get('/me/likedAlbums', authController.protect, authController.getLikedAlbums)
 
 
 
@@ -214,6 +273,17 @@ router.delete('/me/unlikeAlbum', authController.protect, authController.unlikeAl
 */
 router.put('/me/likePlaylist', authController.protect, authController.likePlaylist)
 
+/**
+* Route for getting liked playlists
+* @name get/me/likedPlaylists
+* @function
+* @memberof module:routes/users
+* @inner
+* @param {string} path - like playlists path
+* @param {callback} middleware - Protect middleware.
+* @param {callback} middleware - get liked playlists middleware.
+*/
+router.get('/me/likedPlaylists', authController.protect, authController.getLikedPlaylists)
 
 
 /**
@@ -385,7 +455,7 @@ router.delete('/me/artist/:confirmationCode', authController.protect, authContro
 
 /**
  * Route for updating notifications token of user
- * @name post/me/notifications/token
+ * @name put/me/notifications/token
  * @function
  * @memberof module:routes/users
  * @inner
