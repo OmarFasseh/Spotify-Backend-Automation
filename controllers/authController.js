@@ -369,7 +369,8 @@ exports.followArtistUser = catchAsync(async (req, res, next) => {
   const body = `${user.name} has followed you!`
   const followedUserId = await followedUser._id.toString()
   const userId = await user._id.toString()
-  const data = {'uri': user.uri, 'id': userId, 'href':user.href}
+  const images = user.images
+  const data = {'uri': user.uri, 'id': userId, 'href':user.href, 'images':images}
   const notif = await notificationService.generateNotification(title,body,followedUserId,data)
   await notificationService.sendNotification(followedUserId,notif)
 
@@ -624,7 +625,8 @@ exports.likePlaylist = catchAsync(async (req, res, next) => {
   const body = `${user.name} has liked the playlist ${playlist.name}!`
   const ownerId = playlist.owner.toString()
   const userId = user._id.toString()
-  const data = {'uri': user.uri, 'id': userId, 'href':user.href}
+  const images = user.images
+  const data = {'uri': user.uri, 'id': userId, 'href':user.href, 'images':images}
   const notif = await notificationService.generateNotification(title,body,ownerId,data)
   await notificationService.sendNotification(ownerId,notif)
 
@@ -651,6 +653,36 @@ exports.getLikedPlaylists=catchAsync(async (req, res, next) => {
   }
 
   const features = new APIFeatures(Playlist.find().where('_id').in(user.likedPlaylists), req.query).paginate().limitFieldsPlaylist()
+  const playlists = await features.query
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      playlists
+    }
+  })
+
+})
+
+
+
+
+/**
+* A function to get created playlists
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getCreatedPlaylists=catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+
+  if (user.createdPlaylists.length==0) {
+    return next(new AppError('You did not create any playlist', 404))
+  }
+
+  const features = new APIFeatures(Playlist.find().where('_id').in(user.createdPlaylists), req.query).paginate().limitFieldsPlaylist()
   const playlists = await features.query
 
   res.status(200).json({
@@ -840,15 +872,13 @@ exports.changeImage = catchAsync(async (req, res, next) => {
 
   // get the user 
   const user = await User.findById(req.user.id)
-  
-  if(!req.body.url) {
-    return next(new AppError("Enter the new image", 400))
-  }
 
-  //change image
-  user.images = req.body.url
+  if (req.file) {
+  user.images = `${process.env.API_URL}/public/imgs/users/${req.file.filename} `
   await user.save()
+  }
   
+
   res.status(200).json({
     status: 'Image updated'
   })
