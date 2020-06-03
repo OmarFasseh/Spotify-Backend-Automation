@@ -375,7 +375,7 @@ exports.followArtistUser = catchAsync(async (req, res, next) => {
   await notificationService.sendNotification(followedUserId,notif)
 
   //Subscribe to the artist
-  await notificationService.subscribeToTopic(user._id,followedUserId)
+  //await notificationService.subscribeToTopic(user._id,followedUserId)
 
   res.status(204).json({
     status: 'Success'
