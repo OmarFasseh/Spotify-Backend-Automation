@@ -369,94 +369,19 @@ exports.followArtistUser = catchAsync(async (req, res, next) => {
   const body = `${user.name} has followed you!`
   const followedUserId = await followedUser._id.toString()
   const userId = await user._id.toString()
-  const images = user.images
+  const images = user.images[0]
   const data = {'uri': user.uri, 'id': userId, 'href':user.href, 'images':images}
   const notif = await notificationService.generateNotification(title,body,followedUserId,data)
   await notificationService.sendNotification(followedUserId,notif)
 
   //Subscribe to the artist
-  await notificationService.subscribeToTopic(user._id,followedUserId)
+  await notificationService.subscribeToTopic(user._id,followedUserId,1)
 
   res.status(204).json({
     status: 'Success'
   })
 })
 
-/**
-* A function to get followed artist or user
-* @alias module:controllers/auth
-* @param {Request}  - The function takes the request as a parameter to access its body.
-* @param {Respond} - The respond sent
-* @param {next} - The next function in the middleware
-*/
-exports.getfollowedArtistUser= catchAsync(async (req, res, next) => {
-
-  const user = await User.findById(req.user.id)
-  // console.log(req)
-  if (user.following.length==0) {
-    return next(new AppError('You did not follow any artist/user', 404))
-  }
-
-  const users = await User.find().where('_id').in(user.following).select('_id name uri href externalUrls images role followers userStats artistInfo')
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      users
-    }
-  })
-
-})
-
-/**
-* A function to get followed artists 
-* @alias module:controllers/auth
-* @param {Request}  - The function takes the request as a parameter to access its body.
-* @param {Respond} - The respond sent
-* @param {next} - The next function in the middleware
-*/
-exports.getfollowedArtists= catchAsync(async (req, res, next) => {
-
-  const user = await User.findById(req.user.id)
-  const users = await User.find({role:'artist'}).where('_id').in(user.following).select('_id name uri href externalUrls images role followers userStats artistInfo')
-
-  if (users.length==0) {
-    return next(new AppError('You did not follow any artist', 404))
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      users
-    }
-  })
-
-})
-
-/**
-* A function to get user's followers 
-* @alias module:controllers/auth
-* @param {Request}  - The function takes the request as a parameter to access its body.
-* @param {Respond} - The respond sent
-* @param {next} - The next function in the middleware
-*/
-exports.getUserfollowers= catchAsync(async (req, res, next) => {
-
-  const user = await User.findById(req.user.id)
-  if (user.followers.length==0) {
-    return next(new AppError('You do not have any followers', 404))
-  }
-
-  const users = await User.find().where('_id').in(user.followers).select('_id name uri href externalUrls images role followers userStats artistInfo')
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      users
-    }
-  })
-
-})
 
 
 
@@ -495,32 +420,6 @@ exports.likeTrack = catchAsync(async (req, res, next) => {
 })
 
 
-/**
-* A function to get liked tracks
-* @alias module:controllers/auth
-* @param {Request}  - The function takes the request as a parameter to access its body.
-* @param {Respond} - The respond sent
-* @param {next} - The next function in the middleware
-*/
-exports.getLikedTracks=catchAsync(async (req, res, next) => {
-
-  const user = await User.findById(req.user.id)
-
-  if (user.likedTracks.length==0) {
-    return next(new AppError('You did not like any track', 404))
-  }
-
-  const features = new APIFeatures(Track.find().where('_id').in(user.likedTracks), req.query).limitFieldsTracks().paginate()
-  const tracks = await features.query
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tracks
-    }
-  })
-
-})
 
 
 
@@ -554,42 +453,12 @@ exports.likeAlbum = catchAsync(async (req, res, next) => {
 
   await user.save()
 
-  console.log(user.likedAlbums)
 
   res.status(204).json({
     status: 'Success'
   })
 })
 
-/**
-* A function to get liked albums
-* @alias module:controllers/auth
-* @param {Request}  - The function takes the request as a parameter to access its body.
-* @param {Respond} - The respond sent
-* @param {next} - The next function in the middleware
-*/
-exports.getLikedAlbums=catchAsync(async (req, res, next) => {
-
-  const user = await User.findById(req.user.id)
-
-  if (user.likedAlbums.length==0) {
-    return next(new AppError('You did not like any album', 404))
-  }
-
-  const albums = await Album.find().where('_id').in(user.likedAlbums).select('-__v').populate({
-    path: 'artists',
-    select: '_id name uri href externalUrls images role followers userStats artistInfo' // user public data
-
-  })
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      albums
-    }
-  })
-
-})
 
 
 
@@ -625,44 +494,18 @@ exports.likePlaylist = catchAsync(async (req, res, next) => {
   const body = `${user.name} has liked the playlist ${playlist.name}!`
   const ownerId = playlist.owner.toString()
   const userId = user._id.toString()
-  const images = user.images
+  const images = user.images[0]
   const data = {'uri': user.uri, 'id': userId, 'href':user.href, 'images':images}
   const notif = await notificationService.generateNotification(title,body,ownerId,data)
   await notificationService.sendNotification(ownerId,notif)
 
-  console.log(user.likedPlaylists)
 
   res.status(204).json({
     status: 'Success'
   })
 })
 
-/**
-* A function to get liked playlists
-* @alias module:controllers/auth
-* @param {Request}  - The function takes the request as a parameter to access its body.
-* @param {Respond} - The respond sent
-* @param {next} - The next function in the middleware
-*/
-exports.getLikedPlaylists=catchAsync(async (req, res, next) => {
 
-  const user = await User.findById(req.user.id)
-
-  if (user.likedPlaylists.length==0) {
-    return next(new AppError('You did not like any playlist', 404))
-  }
-
-  const features = new APIFeatures(Playlist.find().where('_id').in(user.likedPlaylists), req.query).paginate().limitFieldsPlaylist()
-  const playlists = await features.query
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      playlists
-    }
-  })
-
-})
 
 
 
@@ -718,8 +561,6 @@ exports.unfollowArtistUser = catchAsync(async (req, res, next) => {
     return next(new AppError('You are not following this user', 400))
   }
 
-  console.log(user.following)
-  console.log(unfollowedUser.followers)
 
   // user unfollows the unfollowed user
   const toBeRemoved = (element) => element == req.body.id;
@@ -731,8 +572,12 @@ exports.unfollowArtistUser = catchAsync(async (req, res, next) => {
   await user.save()
   await unfollowedUser.save()
 
-  console.log(user.following)
-  console.log(unfollowedUser.followers)
+
+  //UnSubscribe to the artist
+  const unfollowedUserId = await unfollowedUser._id.toString()
+  await notificationService.subscribeToTopic(user._id,unfollowedUserId,0)
+  
+
 
   res.status(204).json({
     status: 'Success'
@@ -761,7 +606,6 @@ exports.unlikeTrack = catchAsync(async (req, res, next) => {
   user.likedTracks.splice(user.likedTracks.findIndex(toBeRemoved), 1)
   await user.save()
 
-  console.log(user.likedTracks)
 
   res.status(204).json({
     status: 'Success'
@@ -792,7 +636,6 @@ exports.unlikeAlbum = catchAsync(async (req, res, next) => {
   user.likedAlbums.splice(user.likedAlbums.findIndex(toBeRemoved), 1)
   await user.save()
 
-  console.log(user.likedAlbums)
 
   res.status(204).json({
     status: 'Success'
@@ -822,7 +665,6 @@ exports.unlikePlaylist = catchAsync(async (req, res, next) => {
   user.likedPlaylists.splice(user.likedPlaylists.findIndex(toBeRemoved), 1)
   await user.save()
 
-  console.log(user.likedPlaylists)
 
   res.status(204).json({
     status: 'Success'
@@ -936,7 +778,6 @@ exports.addTrackToPlaylist = catchAsync(async (req, res, next) => {
   const track = await Track.findById(req.body.id)
 
 
-  console.log(playlist)
 
   if(!playlist) {
     return next(new AppError("There is no playlist with this id", 400))
@@ -958,3 +799,165 @@ exports.addTrackToPlaylist = catchAsync(async (req, res, next) => {
   })
 })
 
+
+
+/**
+* A function to get followed artist or user
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getfollowedArtistUser= catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+  if (user.following.length==0) {
+    return next(new AppError('You did not follow any artist/user', 404))
+  }
+
+  const users = await User.find().where('_id').in(user.following).select('_id name uri href externalUrls images role followers userStats artistInfo')
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      users
+    }
+  })
+
+})
+
+/**
+* A function to get followed artists 
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getfollowedArtists= catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+  const users = await User.find({role:'artist'}).where('_id').in(user.following).select('_id name uri href externalUrls images role followers userStats artistInfo')
+
+  if (users.length==0) {
+    return next(new AppError('You did not follow any artist', 404))
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      users
+    }
+  })
+
+})
+
+/**
+* A function to get user's followers 
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getUserfollowers= catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+  if (user.followers.length==0) {
+    return next(new AppError('You do not have any followers', 404))
+  }
+
+  const users = await User.find().where('_id').in(user.followers).select('_id name uri href externalUrls images role followers userStats artistInfo')
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      users
+    }
+  })
+
+})
+
+/**
+* A function to get liked playlists
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getLikedPlaylists=catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+
+  if (user.likedPlaylists.length==0) {
+    return next(new AppError('You did not like any playlist', 404))
+  }
+
+  const features = new APIFeatures(Playlist.find().where('_id').in(user.likedPlaylists), req.query).paginate().limitFieldsPlaylist()
+  const playlists = await features.query
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      playlists
+    }
+  })
+
+})
+
+/**
+* A function to get liked albums
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getLikedAlbums=catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+
+  if (user.likedAlbums.length==0) {
+    return next(new AppError('You did not like any album', 404))
+  }
+
+  const albums = await Album.find().where('_id').in(user.likedAlbums).select('-__v').populate({
+    path: 'artists',
+    select: '_id name uri href externalUrls images role followers userStats artistInfo' // user public data
+
+  })
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      albums
+    }
+  })
+
+})
+
+
+
+/**
+* A function to get liked tracks
+* @alias module:controllers/auth
+* @param {Request}  - The function takes the request as a parameter to access its body.
+* @param {Respond} - The respond sent
+* @param {next} - The next function in the middleware
+*/
+exports.getLikedTracks=catchAsync(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id)
+
+  if (user.likedTracks.length==0) {
+    return next(new AppError('You did not like any track', 404))
+  }
+
+  const features = new APIFeatures(Track.find().where('_id').in(user.likedTracks), req.query).limitFieldsTracks().paginate()
+  const tracks = await features.query
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tracks
+    }
+  })
+
+})
