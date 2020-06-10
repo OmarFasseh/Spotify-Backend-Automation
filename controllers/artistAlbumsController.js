@@ -191,8 +191,8 @@ exports.addTracktoAlbum = catchAsync(async (req, res, next) => {
     for(i = 0; i < followers.length(); i++) 
     notif = await notificationService.generateNotification(title,body,followers[i].toString(),data)
     notif.topic = artistId
-    notif.token = undefined
-    await notificationService.sendNotification(notif)
+    delete notif.token
+    await notificationService.sendNotificationTopic(notif)
   }
 
 
