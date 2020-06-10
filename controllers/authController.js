@@ -578,10 +578,6 @@ exports.unfollowArtistUser = catchAsync(async (req, res, next) => {
   await notificationService.subscribeToTopic(user._id,unfollowedUserId,0)
   
 
-
-  //UnSubscribe to the artist
-  const unfollowedUserId = await unfollowedUser._id.toString()
-  await notificationService.subscribeToTopic(user._id,unfollowedUserId,0)
   
 
 
