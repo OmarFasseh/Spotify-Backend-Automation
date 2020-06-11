@@ -3,11 +3,8 @@
  * @const
  */
 const sinon = require('sinon')
-/**
- * express module
- * User model from the database
- * @const
- */
+
+
 
 /**
  * mongoose for db management

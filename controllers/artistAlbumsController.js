@@ -90,6 +90,7 @@ const notificationService = new NotificationServices()
 exports.addAlbum = catchAsync(async (req, res, next) => {
   if (req.file) { req.body.image = `${process.env.API_URL}/public/imgs/albums/${req.file.filename}` } else { throw (new AppError('No file received, can\'t add album without an image', 484)) }
 
+
   if (req.body.totalTracks) { req.body.totalTracks = 0 }
 
   // adding the id of the artist to the newly created album

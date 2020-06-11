@@ -79,7 +79,6 @@ createTracks = async () => {
   user5 = (await user5).toString()
   start = user5.indexOf(':')
   const user5Id = user5.substring(start + 2, start + 26)
-
   let user6 = User.find({ name: 'Hana' }).select('_id')
   user6 = (await user6).toString()
   start = user6.indexOf(':')

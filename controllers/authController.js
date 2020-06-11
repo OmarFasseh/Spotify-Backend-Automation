@@ -392,7 +392,7 @@ exports.followArtistUser = catchAsync(async (req, res, next) => {
 exports.likeTrack = catchAsync(async (req, res, next) => {
   // get the user and the track
   const user = await User.findById(req.user.id)
-  const track = await Track.findById(req.body.id)
+  let track = await Track.findById(req.body.id)
 
   // check if the id of the track is given
   if (!track) {
