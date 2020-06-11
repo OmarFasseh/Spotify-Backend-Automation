@@ -4,4 +4,9 @@ WORKDIR '/app'
 COPY package.json .
 RUN npm install
 COPY . .
-RUN npm run test
+COPY service-account-file.json ..
+#RUN npm run test
+
+
+#FROM mongo
+#EXPOSE 27017
