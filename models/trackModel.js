@@ -4,7 +4,6 @@
  * @requires mongoose
  */
 
-
 const mongoose = require('mongoose')
 
 /**
@@ -87,7 +86,19 @@ const trackSchema = new mongoose.Schema({
   isAd: {
     type: Boolean,
     default: false
+  },
+  listensHistory:
+  [{
+    day: Date,
+    numberOfListens: Number
+
   }
+  ],
+  likesHistory:
+  [{
+    userID: mongoose.Schema.ObjectId,
+    day: Date
+  }]
 })
 
 const Track = mongoose.model('Track', trackSchema)
